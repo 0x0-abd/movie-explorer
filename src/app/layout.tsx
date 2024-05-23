@@ -17,6 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <title>Movie Explorer</title>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
