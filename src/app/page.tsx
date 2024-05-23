@@ -60,7 +60,7 @@ export default function Home() {
 
   return (
     <main className="h-screen">
-      <nav className="flex h-16 sticky justify-between items-center gap-4 px-4 z-50 md:px-6 border-b-2">
+      <nav className="sticky top-0 flex h-16 justify-between items-center gap-4 px-4 z-50 md:px-6 border-b-2 bg-background">
         <div className="text-2xl flex gap-4 md:gap-6">
           <Clapperboard className="text-primary" />
           <p>Movies</p>

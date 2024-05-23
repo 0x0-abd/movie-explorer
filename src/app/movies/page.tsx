@@ -82,8 +82,8 @@ export default function Movies() {
     
 
     return (
-        <main className="h-screen">
-            <nav className="flex h-16 sticky justify-between items-center gap-4 px-4 z-50 md:px-6 border-b-2">
+        <main>
+            <nav className="sticky top-0 flex h-16 justify-between items-center gap-4 px-4 z-50 md:px-6 border-b-2 bg-background ">
                 <div className="text-2xl flex gap-4 md:gap-6">
                     <Clapperboard className="text-primary" />
                     <p>Movies</p>
@@ -109,7 +109,7 @@ export default function Movies() {
                 </div>
 
             </nav >
-            <div className="flex flex-col w-full h-full text-center justify-around" style={{ height: "calc(100% - 4rem)" }}>
+            <div className="flex flex-col w-full h-full text-center justify-around">
 
                 {movieData?.results?.length as number === 0 ? (
                     <>No movie found</>
