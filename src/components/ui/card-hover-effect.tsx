@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image"
- 
+import genres from "@/lib/genres";
+
 export const HoverEffect = ({
   items,
   className,
@@ -14,6 +15,9 @@ export const HoverEffect = ({
     overview: string;
     poster_path: string;
     adult: boolean;
+    release_date: string;
+    genre_ids: number[];
+    runtime: number;
   }[];
   className?: string;
 }) => {
@@ -26,12 +30,22 @@ export const HoverEffect = ({
     return title;
   };
 
+  function display_genre(genre_ids: number[]) {
+    const genreNames = genre_ids.map(id => {
+      const genre = genres.find(g => g.id === id);
+      return genre ? genre.name : null;
+    }).filter(name => name !== null);
+  
+    return genreNames.join(', ');
+  }
+
   return (
     <div
       className={cn(
-        "grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-15",
+        "grid grid-cols-1 md:grid-cols-3  lg:grid-cols-5  py-15 self-center ",
         className
       )}
+      style={{maxWidth: "1336px"}}
     >
       {items.map((item, idx) => (
         <Link
@@ -59,11 +73,13 @@ export const HoverEffect = ({
             )}
           </AnimatePresence>
           <Card title={item.title} poster_path={item.poster_path}>
-            <CardTitle>{item.title}</CardTitle>
-            <CardDescription>{!item.overview && "Description for the movie not available"}{truncateTitle(item.overview, 250)}</CardDescription>
+            <CardTitle className="text-start">{item.title}</CardTitle>
+            <CardDescription className="text-start text-muted-foreground ">{item.release_date.substring(0, 4)} <span>{item.adult ? "Adult" : ""}</span></CardDescription>
+            {/* <CardDescription>{!item.overview && "Description for the movie not available"}{truncateTitle(item.overview, 250)}</CardDescription> */}
+            <CardDescription className="text-start pb-1">{display_genre(item.genre_ids)}</CardDescription>
           </Card>
         </Link>
-      ))}
+      ))}``
     </div>
   );
 };
@@ -82,11 +98,11 @@ export const Card = ({
   return (
     <div
       className={cn(
-        "rounded-2xl h-full w-full p-4 overflow-hidden bg-background border b-2 dark:border-white/[0.2] group-hover:border-slate-700 relative z-20",
+        "rounded-2xl h-full w-full overflow-hidden bg-background border b-2 dark:border-white/[0.2] group-hover:border-slate-700 relative z-20",
         className
       )}
     >
-      <div className="relative z-50 lg:flex">
+      <div className="relative z-50">
         {poster_path && <Image
         className="block m-auto w-auto h-auto"
             src={`https://image.tmdb.org/t/p/w500${poster_path}`}
@@ -94,7 +110,7 @@ export const Card = ({
             width={200}
             height={500}
          />}
-        <div className="p-4">{children}</div>
+        <div className="px-2">{children}</div>
       </div>
     </div>
   );
@@ -107,7 +123,7 @@ export const CardTitle = ({
   children: React.ReactNode;
 }) => {
   return (
-    <h4 className={cn("text-primary font-bold tracking-wide mt-4", className)}>
+    <h4 className={cn("text-primary font-medium text-xl tracking-wide mt-4", className)}>
       {children}
     </h4>
   );
@@ -122,7 +138,7 @@ export const CardDescription = ({
   return (
     <p
       className={cn(
-        "mt-8 text-foreground tracking-wide leading-relaxed text-sm",
+        "mt-2 text-foreground tracking-wide leading-relaxed text-base",
         className
       )}
     >

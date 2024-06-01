@@ -9,59 +9,48 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
-    FormLabel,
     FormMessage,
-  } from "@/components/ui/form"
+} from "@/components/ui/form"
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
 import { useState, useEffect } from "react";
 import axios from "@/lib/axios";
 import { HoverEffect } from "@/components/ui/card-hover-effect";
+import genres from "@/lib/genres";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
     searchQuery: z.string()
-  })
+})
 
 type movieData = {
-    page:number;
-    results:any[];
+    page: number;
+    results: any[];
     total_pages: number;
     total_results: number;
 }
 
 export default function Movies() {
 
-    const [ movieData, setMovieData ] = useState<movieData | undefined>()
+    const [movieData, setMovieData] = useState<movieData | undefined>()
+    const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-          searchQuery: "",
+            searchQuery: "",
         },
-      })
-
-    const genres = [
-        { "id": 28, "name": "Action" },
-        { "id": 12, "name": "Adventure" },
-        { "id": 16, "name": "Animation" },
-        { "id": 35, "name": "Comedy" },
-        { "id": 80, "name": "Crime" },
-        { "id": 99, "name": "Documentary" },
-        { "id": 18, "name": "Drama" },
-        { "id": 10751, "name": "Family" },
-        { "id": 14, "name": "Fantasy" },
-        { "id": 36, "name": "History" },
-        { "id": 27, "name": "Horror" },
-        { "id": 10402, "name": "Music" },
-        { "id": 9648, "name": "Mystery" },
-        { "id": 10749, "name": "Romance" },
-        { "id": 878, "name": "Science Fiction" },
-        { "id": 10770, "name": "TV Movie" },
-        { "id": 53, "name": "Thriller" },
-        { "id": 10752, "name": "War" },
-        { "id": 37, "name": "Western" }
-    ]
+    })
 
     const genreNames = ["Action", "Mystery", "Romance", "Drama", "Thriller", "Science Fiction", "Adventure", "History", "Comedy", "War", "Crime", "Horror"]
 
@@ -69,17 +58,45 @@ export default function Movies() {
         try {
             const response = await axios(`/search/${values.searchQuery}`)
             setMovieData(response.data)
-            console.log(response.data)
-        } catch(e) {
+            // console.log(response.data)
+        } catch (e) {
             console.error(e)
         }
         // console.log(values)
     }
 
+    const handleGenreButtonClick = async (genreNum: number) => {
+        setSelectedGenres((prevSelectedGenres) => {
+            if (prevSelectedGenres.includes(genreNum)) {
+                return prevSelectedGenres.filter((id) => id !== genreNum);
+            } else {
+                return [...prevSelectedGenres, genreNum];
+            }
+        })
+    }
+
     useEffect(() => {
-        onSubmit({searchQuery:""})
+        onSubmit({ searchQuery: "" })
     }, [])
-    
+
+    useEffect(() => {
+        const fetchMoviesByGenre = async () => {
+            try {
+                const response = await axios.post(`/genre/`, {
+                    genres: selectedGenres
+                });
+                // console.log(selectedGenres);
+                setMovieData(response.data);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        if (selectedGenres.length > 0) {
+            fetchMoviesByGenre();
+        } else {
+            onSubmit({ searchQuery: "" });
+        }
+    }, [selectedGenres]);
 
     return (
         <main>
@@ -110,13 +127,33 @@ export default function Movies() {
 
             </nav >
             <div className="flex flex-col w-full h-full text-center justify-around">
-
+                <div className="hidden md:flex flex-wrap justify-center gap-2 px-3 py-6 self-center" style={{ maxWidth: "1336px" }}>
+                    {genres.map(value => (<Button key={value.id} className={`${selectedGenres.includes(value.id) ? '' : ''}`} variant={selectedGenres.includes(value.id) ? undefined : "outline"} onClick={() => handleGenreButtonClick(value.id)}>{value.name}</Button>))}
+                </div>
+                <div className="md:hidden self-center pt-4 pb-2">
+                    <Drawer>
+                        <DrawerTrigger asChild><Button>Select Genres</Button></DrawerTrigger>
+                        <DrawerContent>
+                            <DrawerHeader>
+                                <DrawerTitle className="text-center">Choose Genre(s)</DrawerTitle>
+                            </DrawerHeader>
+                            <DrawerFooter>
+                                <div className="flex flex-wrap justify-center gap-2 px-3 py-6 self-center" style={{ maxWidth: "1336px" }}>
+                                    {genres.map(value => (<Button key={value.id} className={`${selectedGenres.includes(value.id) ? '' : ''}`} variant={selectedGenres.includes(value.id) ? undefined : "outline"} onClick={() => handleGenreButtonClick(value.id)}>{value.name}</Button>))}
+                                </div>
+                                <DrawerClose asChild>
+                                    <Button variant="outline">Done!</Button>
+                                </DrawerClose>
+                            </DrawerFooter>
+                        </DrawerContent>
+                    </Drawer>
+                </div>
                 {movieData?.results?.length as number === 0 ? (
                     <>No movie found</>
                 ) : (
                     <></>
-                ) }
-                {movieData?.results && movieData?.results?.length as number > 0 && <HoverEffect items={movieData?.results}/>}
+                )}
+                {movieData?.results && movieData?.results?.length as number > 0 && <HoverEffect items={movieData?.results} />}
             </div>
         </main >
     )
