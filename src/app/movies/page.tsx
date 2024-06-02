@@ -20,20 +20,18 @@ import { HoverEffect } from "@/components/ui/card-hover-effect";
 import { genres } from "@/lib/genres";
 import { Button } from "@/components/ui/button";
 import useDebounce from "@/components/debounce";
+import { useMovieContext } from "../movie-context";
 
-
-type movieData = {
-    page: number;
-    results: any[];
-    total_pages: number;
-    total_results: number;
-}
+// type movieData = {
+//     page: number;
+//     results: any[];
+//     total_pages: number;
+//     total_results: number;
+// }
 
 export default function Movies() {
 
-    const [movieData, setMovieData] = useState<movieData | undefined>();
-    const [input, setInput] = useState<string>('');
-    const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+    const { movieData, setMovieData, input, setInput, selectedGenres, setSelectedGenres } = useMovieContext();
     const debouncedInput = useDebounce(input, 250)
 
 
@@ -78,8 +76,6 @@ export default function Movies() {
         };
         if (selectedGenres.length > 0) {
             fetchMoviesByGenre();
-        } else {
-            onSubmit("");
         }
     }, [selectedGenres]);
 
@@ -106,7 +102,7 @@ export default function Movies() {
                     </Link>
                 </div>
                 <div className="flex gap-4">
-                    <Input type="text" placeholder="Search movies..." onChange={e => setInput(e.target.value)} />
+                    <Input type="text" placeholder="Search movies..." onChange={e => setInput(e.target.value)} value={input} />
                     <ModeToggle />
                 </div>
 

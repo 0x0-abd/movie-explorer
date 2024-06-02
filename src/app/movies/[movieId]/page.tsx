@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import axios from "@/lib/axios";
 import Image from "next/image";
-import { display_genre } from "@/lib/genres";
 
 export default function Movies({ params }: {
     params: {
@@ -23,7 +22,7 @@ export default function Movies({ params }: {
     const formatRuntime = (runtime: number): string => {
         const hours = Math.floor(runtime / 60);
         const minutes = runtime % 60;
-        return `${hours} hours ${minutes} minutes`;
+            return minutes > 0 ? `${hours} hours ${minutes} minutes` : `${hours} hours`;
     };
 
     useEffect(() => {
@@ -31,7 +30,7 @@ export default function Movies({ params }: {
             try {
                 const response = await axios(`/search/id/${params.movieId}`);
                 setMovieData(response.data);
-                console.log(response.data);
+                // console.log(response.data);
             } catch (e) {
                 console.error(e);
             }
@@ -77,10 +76,10 @@ export default function Movies({ params }: {
                                 height={500}
                             />
                         </div>
-                        <div className="flex flex-col text-center p-4 md:text-left gap-4">
+                        <div className="flex flex-col text-center p-4 md:text-left gap-4 md:gap-8">
                             <div>
                                 <h1 className="text-5xl font-bold text-primary">{movieData?.title}</h1>
-                                <h3 className="text-xl text-muted-foreground">{formatGenres(movieData?.genres)}</h3>
+                                <h3 className="text-xl text-muted-foreground">{formatGenres(movieData?.genres)} <span className="float-right">{movieData?.release_date}</span></h3>
                             </div>
                             <p>{movieData?.overview}</p>
                             <p>{formatRuntime(movieData.runtime)}</p>
