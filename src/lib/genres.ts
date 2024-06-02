@@ -1,4 +1,4 @@
-export default [
+export const genres = [
     { "id": 28, "name": "Action" },
     { "id": 12, "name": "Adventure" },
     { "id": 16, "name": "Animation" },
@@ -19,3 +19,12 @@ export default [
     { "id": 10752, "name": "War" },
     { "id": 37, "name": "Western" }
   ]
+
+  export function display_genre(genre_ids: number[]) {
+    const genreNames = genre_ids.map(id => {
+      const genre = genres.find(g => g.id === id);
+      return genre ? genre.name : null;
+    }).filter(name => name !== null);
+  
+    return genreNames.join(', ');
+  }

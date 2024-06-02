@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import Image from "next/image"
-import genres from "@/lib/genres";
+import {display_genre} from "@/lib/genres";
 
 export const HoverEffect = ({
   items,
@@ -30,14 +30,6 @@ export const HoverEffect = ({
     return title;
   };
 
-  function display_genre(genre_ids: number[]) {
-    const genreNames = genre_ids.map(id => {
-      const genre = genres.find(g => g.id === id);
-      return genre ? genre.name : null;
-    }).filter(name => name !== null);
-  
-    return genreNames.join(', ');
-  }
 
   return (
     <div

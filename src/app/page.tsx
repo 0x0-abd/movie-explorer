@@ -18,7 +18,7 @@ const formSchema = z.object({
 
 export default function Home() {
   const router = useRouter()
-  const [ query, setQuery ] = useState<string>()
+  const [query, setQuery] = useState<string>()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -29,7 +29,7 @@ export default function Home() {
 
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    
+
     console.log(values)
     setQuery(values.searchQuery)
     router.push('/movies')
@@ -40,12 +40,14 @@ export default function Home() {
   return (
     <main className="h-screen">
       <nav className="sticky top-0 flex h-16 justify-between items-center gap-4 px-4 z-50 md:px-6 border-b-2 bg-background">
-        <div className="text-2xl flex gap-4 md:gap-6">
-          <Clapperboard className="text-primary" />
-          <p>Movies</p>
+        <div className="text-2xl">
+          <Link href="/" className="flex gap-4 md:gap-6">
+            <Clapperboard className="text-primary" />
+            <p>Movies</p>
+          </Link>
         </div>
         <div className="flex gap-4">
-        <Link href="/movies" className="text-primary content-center underline"><div>Explore</div></Link>
+          <Link href="/movies" className="text-primary content-center underline"><div>Explore</div></Link>
           <ModeToggle />
         </div>
 

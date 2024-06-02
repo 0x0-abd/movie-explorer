@@ -3,16 +3,7 @@
 import { Clapperboard, Search } from "lucide-react";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Input } from "@/components/ui/input";
-import { z } from "zod"
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormMessage,
-} from "@/components/ui/form"
+import Link from "next/link";
 import {
     Drawer,
     DrawerClose,
@@ -23,15 +14,13 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "@/lib/axios";
 import { HoverEffect } from "@/components/ui/card-hover-effect";
-import genres from "@/lib/genres";
+import { genres } from "@/lib/genres";
 import { Button } from "@/components/ui/button";
+import useDebounce from "@/components/debounce";
 
-const formSchema = z.object({
-    searchQuery: z.string()
-})
 
 type movieData = {
     page: number;
@@ -42,21 +31,17 @@ type movieData = {
 
 export default function Movies() {
 
-    const [movieData, setMovieData] = useState<movieData | undefined>()
+    const [movieData, setMovieData] = useState<movieData | undefined>();
+    const [input, setInput] = useState<string>('');
     const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+    const debouncedInput = useDebounce(input, 250)
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            searchQuery: "",
-        },
-    })
 
     const genreNames = ["Action", "Mystery", "Romance", "Drama", "Thriller", "Science Fiction", "Adventure", "History", "Comedy", "War", "Crime", "Horror"]
 
-    const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const onSubmit = async (value: string) => {
         try {
-            const response = await axios(`/search/${values.searchQuery}`)
+            const response = await axios(`/search/${value}`)
             setMovieData(response.data)
             // console.log(response.data)
         } catch (e) {
@@ -75,9 +60,9 @@ export default function Movies() {
         })
     }
 
-    useEffect(() => {
-        onSubmit({ searchQuery: "" })
-    }, [])
+    // useEffect(() => {
+    //     onSubmit("")
+    // }, [])
 
     useEffect(() => {
         const fetchMoviesByGenre = async () => {
@@ -94,34 +79,34 @@ export default function Movies() {
         if (selectedGenres.length > 0) {
             fetchMoviesByGenre();
         } else {
-            onSubmit({ searchQuery: "" });
+            onSubmit("");
         }
     }, [selectedGenres]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios(`/search/${debouncedInput}`)
+                setMovieData(response.data)
+                // console.log(response.data)
+            } catch (e) {
+                console.error(e)
+            }
+        }
+        fetchData()
+    }, [debouncedInput])
 
     return (
         <main>
             <nav className="sticky top-0 flex h-16 justify-between items-center gap-4 px-4 z-50 md:px-6 border-b-2 bg-background ">
-                <div className="text-2xl flex gap-4 md:gap-6">
-                    <Clapperboard className="text-primary" />
-                    <p>Movies</p>
+                <div className="text-2xl">
+                    <Link href="/" className="flex gap-4 md:gap-6">
+                        <Clapperboard className="text-primary" />
+                        <p>Movies</p>
+                    </Link>
                 </div>
                 <div className="flex gap-4">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            <FormField
-                                control={form.control}
-                                name="searchQuery"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input placeholder="Search movies..." {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </form>
-                    </Form>
+                    <Input type="text" placeholder="Search movies..." onChange={e => setInput(e.target.value)} />
                     <ModeToggle />
                 </div>
 
