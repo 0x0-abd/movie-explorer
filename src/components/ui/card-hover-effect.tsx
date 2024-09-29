@@ -66,9 +66,9 @@ export const HoverEffect = ({
           </AnimatePresence>
           <Card title={item.title} poster_path={item.poster_path}>
             <CardTitle className="text-start">{item.title}</CardTitle>
-            <CardDescription className="text-start text-muted-foreground ">{item.release_date.substring(0, 4)} <span>{item.adult ? "Adult" : ""}</span></CardDescription>
+            <CardDescription className="text-start text-muted-foreground ">{item.release_date?.substring(0, 4)} <span>{item.adult ? "Adult" : ""}</span></CardDescription>
             {/* <CardDescription>{!item.overview && "Description for the movie not available"}{truncateTitle(item.overview, 250)}</CardDescription> */}
-            <CardDescription className="text-start pb-1">{display_genre(item.genre_ids)}</CardDescription>
+            <CardDescription className="text-start pb-1">{item.genre_ids && display_genre(item.genre_ids)}</CardDescription>
           </Card>
         </Link>
       ))}``
